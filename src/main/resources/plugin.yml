@@ -1,0 +1,8 @@
+name: VMotd
+version: '${project.version}'
+main: me.voten.vmotd.VMotd
+api-version: 1.15
+prefix: VMotd
+authors: [ Voten641 ]
+description: TODO
+website: voten641.github.io

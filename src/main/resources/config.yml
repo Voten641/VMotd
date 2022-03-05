@@ -1,0 +1,12 @@
+maxPlayers: 1337
+motd:
+  - "&atesttesttesttest\n&d123123"
+  - "&basdasdasdasdasdasd\n&esdfgsdfgsdfg"
+  - "&cjdjdjdjdjdjdjjdjdjdjd\n&0jdjdjdjdjdjdj"
+serverDescription:
+  - "&c<----------------------->"
+  - "&eWebsite: Voten641.github.io"
+  - "&c<----------------------->"
+fakePlayers: true
+fakePlayersAmount: 111
+showRealPlayers: true
