@@ -37,8 +37,8 @@ class VMotd : JavaPlugin() {
         InitVMotd(this)
         saveDefaultConfig()
         config.options().copyDefaults(true)
-        saveConfig()
         server.pluginManager.registerEvents(MotdChangeEvent, this)
+        saveConfig()
         fakeplayers = config.getInt("fakePlayersAmount")
         for(s in config.getStringList("motd")){
             motdlist.add(s.replace("&","§"))
