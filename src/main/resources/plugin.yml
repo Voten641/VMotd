@@ -5,4 +5,9 @@ api-version: 1.15
 prefix: VMotd
 authors: [ Voten641 ]
 description: TODO
+depend:
+  - ProtocolLib
 website: voten641.github.io
+commands:
+  vmotd:
+    permission: vmotd.admin

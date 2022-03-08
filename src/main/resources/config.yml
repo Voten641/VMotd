@@ -1,12 +1,15 @@
+#avaible variables: %playeronline% %playermax% %serverversion%
 maxPlayers: 1337
 motd:
-  - "&atesttesttesttest\n&d123123"
-  - "&basdasdasdasdasdasd\n&esdfgsdfgsdfg"
-  - "&cjdjdjdjdjdjdjjdjdjdjd\n&0jdjdjdjdjdjdj"
+  - "&aMade by Voten641\n&d%playeronline%"
+  - "&Please review\n&emy plugin"
 serverDescription:
   - "&c<----------------------->"
   - "&eWebsite: Voten641.github.io"
+  - "&eMax Player: %playermax%"
   - "&c<----------------------->"
+enableTextAsPlayerCount: true
+textAsPlayerCount: "&eServer Version: %serverversion%"
 fakePlayers: true
 fakePlayersAmount: 111
 showRealPlayers: true
