@@ -2,11 +2,14 @@ package me.voten.vmotd
 
 import com.comphenix.protocol.wrappers.WrappedGameProfile
 import com.comphenix.protocol.wrappers.WrappedServerPing
+import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 import java.util.*
 
 object VMotdCommand : CommandExecutor {
@@ -17,34 +20,106 @@ object VMotdCommand : CommandExecutor {
         args: Array<out String>?
     ): Boolean {
         if(args?.size!! > 0){
+            val folder = VMotd.folder
+            Bukkit.getServer().pluginManager.getPlugin("VMotd").reloadConfig()
+            val conffile = File(VMotd.folder.parent, "config.yml")
+            val conf = YamlConfiguration.loadConfiguration(conffile)
             if(args[0].uppercase() == "RELOAD"){
-                val folder = File(VMotd().dataFolder, "/icons")
                 if(folder.listFiles() != null) {
                     for (icon in folder.listFiles()) {
-                        if (VMotd().isPng(icon)) {
+                        VMotd.icons.clear()
+                        if (isPng(icon)) {
                             VMotd.icons.add(WrappedServerPing.CompressedImage.fromPng(FileInputStream(icon)))
                             println(WrappedServerPing.CompressedImage.fromPng(FileInputStream(icon)))
                         }
                     }
                 }
-                VMotd.fakeplayers = VMotd().config.getInt("fakePlayersAmount")
-                VMotd.textasplayers = VMotd().config.getString("textAsPlayerCount").replace("&","§")
-                for(s in VMotd().config.getStringList("motd")){
+                VMotd.fakeplayers = conf.getInt("fakePlayersAmount")
+                VMotd.textasplayers = conf.getString("textAsPlayerCount").replace("&","§")
+                VMotd.motdlist.clear()
+                VMotd.serverdesc.clear()
+                for(s in conf.getStringList("motd")){
                     VMotd.motdlist.add(s.replace("&","§"))
                 }
-                for(s in VMotd().config.getStringList("serverDescription")){
+                for(s in conf.getStringList("serverDescription")){
                     VMotd.serverdesc.add(WrappedGameProfile(UUID.randomUUID(), s.replace("&","§")))
                 }
-                VMotd.maxplayers = VMotd().config.getInt("maxPlayers")
+                VMotd.maxplayers = conf.getInt("maxPlayers")
                 sender?.sendMessage("§aVMotd Reloaded")
+                println(VMotd.motdlist)
+            }
+            else if(args[0].uppercase() == "ADDMOTD"){
+                addMotd(sender!!, true, args)
+            }
+            else if(args[0].uppercase() == "DELMOTD"){
+                val m : ArrayList<String> = conf.getStringList("motd") as ArrayList<String>
+                if(args.size > 1){
+                    val num : Int = when(args[1].toIntOrNull()){
+                        null -> -20
+                        else -> args[1].toInt()
+                    }
+                    if(num == -20){
+                        sender?.sendMessage("§aSelect which motd u want to delete")
+                        for(i in 0 until m.size){
+                            sender?.sendMessage("$i   -   " + m[i])
+                        }
+                    }else{
+                        m.removeAt(num)
+                        conf.set("motd", m)
+                        VMotd.motdlist.removeAt(num)
+                        conf.save(conffile)
+                        sender?.sendMessage("§aMotd removed")
+                    }
+                }else {
+                    sender?.sendMessage("§aSelect which motd u want to delete")
+                    for(i in 0 until m.size){
+                        sender?.sendMessage("$i   -   " + m[i])
+                    }
+                }
+            }
+            else if(args[0].uppercase() == "TEMPMOTD"){
+                addMotd(sender!!, false, args)
             }
             else{
-                sender?.sendMessage("§cUsage: /vmotd reload")
+                wrongUsage(sender!!)
             }
         }else{
-            sender?.sendMessage("§cUsage: /vmotd reload")
+            wrongUsage(sender!!)
         }
-        return false;
+        return false
     }
 
+    private fun wrongUsage(sender: CommandSender){
+        sender.sendMessage("§cUsage: ")
+        sender.sendMessage("§8/vmotd reload")
+        sender.sendMessage("§8/vmotd addmotd (text)")
+        sender.sendMessage("§8/vmotd delmotd (number)")
+        sender.sendMessage("§8/vmotd tempmotd (text)")
+    }
+
+    private fun addMotd(sender: CommandSender, save: Boolean, motd: Array<out String>?){
+        val conffile = File(VMotd.folder.parent, "config.yml")
+        val conf = YamlConfiguration.loadConfiguration(conffile)
+        if(motd!!.isNotEmpty()){
+            val s : StringBuilder = StringBuilder()
+            for(i in motd){
+                s.append(" $i")
+            }
+            VMotd.motdlist.add(s.toString())
+            if(save) {
+                val m : ArrayList<String> = conf.getStringList("motd") as ArrayList<String>
+                m.add(motd.toString())
+                conf.set("motd", m)
+                conf.save(conffile)
+            }
+            sender.sendMessage("§aAdded new Motd")
+        }else{
+            sender.sendMessage("§aUsage: /vmotd addmotd/tempmotd (text)")
+        }
+    }
+    
+    @Throws(IOException::class)
+    fun isPng(file: File): Boolean {
+        FileInputStream(file).use { `is` -> return `is`.read() == 137 }
+    }
 }
