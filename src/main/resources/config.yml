@@ -1,8 +1,8 @@
 #avaible variables: %playeronline% %playermax% %serverversion%
 maxPlayers: 1337
 motd:
-  - "&aMade by Voten641\n&d%playeronline%"
-  - "&Please review\n&emy plugin"
+  - "&aMade by Voten641 %newline% &d%playeronline%"
+  - "&fPlease review %newline% &emy plugin"
 serverDescription:
   - "&c<----------------------->"
   - "&eWebsite: Voten641.github.io"

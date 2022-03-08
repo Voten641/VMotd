@@ -10,11 +10,14 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent
 import com.comphenix.protocol.wrappers.WrappedGameProfile
 import com.comphenix.protocol.wrappers.WrappedServerPing
 import org.bukkit.Bukkit
+import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
+import java.util.function.Consumer
 import java.util.logging.Level
 import kotlin.random.Random
 
@@ -30,6 +33,8 @@ class VMotd : JavaPlugin() {
         var serverdesc : ArrayList<WrappedGameProfile> = ArrayList()
         var icons : ArrayList<WrappedServerPing.CompressedImage> = ArrayList()
         lateinit var textasplayers : String
+        lateinit var folder : File
+        lateinit var conf : FileConfiguration
     }
 
     fun InitVMotd(vm : VMotd ){
@@ -42,8 +47,9 @@ class VMotd : JavaPlugin() {
         config.options().copyDefaults(true)
         config.options().header("avaible variables: %playeronline% %playermax% %serverversion%")
         saveConfig()
-        getCommand("vmotd").setExecutor(VMotdCommand)
-        val folder = File(dataFolder, "/icons")
+        conf = config
+        getCommand("vmotd").executor = VMotdCommand
+        folder = File(dataFolder, "/icons")
         if(!folder.exists()){
             if(!folder.mkdirs()) return logger.log(Level.WARNING, "Error while creating Icons folder")
         }
@@ -51,7 +57,6 @@ class VMotd : JavaPlugin() {
             for (icon in folder.listFiles()) {
                 if (isPng(icon)) {
                     icons.add(WrappedServerPing.CompressedImage.fromPng(FileInputStream(icon)))
-                    println(WrappedServerPing.CompressedImage.fromPng(FileInputStream(icon)))
                 }
             }
         }
@@ -72,15 +77,19 @@ class VMotd : JavaPlugin() {
                 handlePing(event.packet.serverPings.read(0))
             }
         })
+        UpdateChecker().checkVersion()
     }
 
     private fun setString(s : String) : String{
-        return s.replace("%playeronline%",getPlayers().toString()).replace("%playermax%", maxplayers.toString())
+        return s.replace("%playeronline%",getPlayers().toString())
+            .replace("%newline%", "\n")
+            .replace("%playermax%", maxplayers.toString())
+            .replace("&","§")
             .replace("%serverversion%", server.bukkitVersion.substring(0, server.bukkitVersion.indexOf("-")))
     }
 
     @Throws(IOException::class)
-    fun isPng(file: File): Boolean {
+    public fun isPng(file: File): Boolean {
         FileInputStream(file).use { `is` -> return `is`.read() == 137 }
     }
     private fun handlePing(ping: WrappedServerPing) {
