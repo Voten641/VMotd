@@ -1,4 +1,4 @@
-package me.voten.vmotd
+package me.voten.vmotd.bukkit
 
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
@@ -11,13 +11,11 @@ import com.comphenix.protocol.wrappers.WrappedGameProfile
 import com.comphenix.protocol.wrappers.WrappedServerPing
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
-import java.util.function.Consumer
 import java.util.logging.Level
 import kotlin.random.Random
 
@@ -37,7 +35,7 @@ class VMotd : JavaPlugin() {
         lateinit var conf : FileConfiguration
     }
 
-    fun InitVMotd(vm : VMotd ){
+    fun InitVMotd(vm : VMotd){
         instance = vm
     }
 
@@ -93,7 +91,7 @@ class VMotd : JavaPlugin() {
         FileInputStream(file).use { `is` -> return `is`.read() == 137 }
     }
     private fun handlePing(ping: WrappedServerPing) {
-        var serverdesc2 : ArrayList<WrappedGameProfile> = ArrayList()
+        val serverdesc2 : ArrayList<WrappedGameProfile> = ArrayList()
         for(w in serverdesc){
             serverdesc2.add(WrappedGameProfile(w.uuid, setString(w.name)))
         }

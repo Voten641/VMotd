@@ -9,7 +9,7 @@ serverDescription:
   - "&eMax Player: %playermax%"
   - "&c<----------------------->"
 enableTextAsPlayerCount: true
-textAsPlayerCount: "&eServer Version: %serverversion%"
+textAsPlayerCount: "&eOnline Players: %playeronline%"
 fakePlayers: true
 fakePlayersAmount: 111
 showRealPlayers: true

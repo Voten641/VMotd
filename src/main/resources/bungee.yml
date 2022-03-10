@@ -1,7 +1,6 @@
 name: VMotd
 version: '${project.version}'
-main: me.voten.vmotd.bukkit.VMotd
-api-version: 1.15
+main: me.voten.vmotd.bungee.VMotd
 prefix: VMotd
 authors: [ Voten641 ]
 depend:

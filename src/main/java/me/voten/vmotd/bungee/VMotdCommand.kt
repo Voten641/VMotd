@@ -1,52 +1,44 @@
-package me.voten.vmotd
+package me.voten.vmotd.bungee
 
-import com.comphenix.protocol.wrappers.WrappedGameProfile
-import com.comphenix.protocol.wrappers.WrappedServerPing
-import org.bukkit.Bukkit
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
-import org.bukkit.command.CommandSender
-import org.bukkit.configuration.file.YamlConfiguration
+import net.md_5.bungee.api.CommandSender
+import net.md_5.bungee.api.Favicon
+import net.md_5.bungee.api.plugin.Command
+import net.md_5.bungee.config.ConfigurationProvider
+import net.md_5.bungee.config.YamlConfiguration
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
+import javax.imageio.ImageIO
+import kotlin.collections.ArrayList
 
-object VMotdCommand : CommandExecutor {
-    override fun onCommand(
-        sender: CommandSender?,
-        command: Command?,
-        label: String?,
-        args: Array<out String>?
-    ): Boolean {
+object VMotdCommand : Command("vmotd") {
+    override fun execute(sender: CommandSender?, args: Array<out String>?) {
         if(args?.size!! > 0){
             val folder = VMotd.folder
-            Bukkit.getServer().pluginManager.getPlugin("VMotd").reloadConfig()
             val conffile = File(VMotd.folder.parent, "config.yml")
-            val conf = YamlConfiguration.loadConfiguration(conffile)
+            val conf = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(conffile)
             if(args[0].uppercase() == "RELOAD"){
                 if(folder.listFiles() != null) {
                     for (icon in folder.listFiles()) {
                         VMotd.icons.clear()
                         if (isPng(icon)) {
-                            VMotd.icons.add(WrappedServerPing.CompressedImage.fromPng(FileInputStream(icon)))
-                            println(WrappedServerPing.CompressedImage.fromPng(FileInputStream(icon)))
+                            VMotd.icons.add(Favicon.create(ImageIO.read(icon)))
                         }
                     }
                 }
-                VMotd.fakeplayers = conf.getInt("fakePlayersAmount")
-                VMotd.textasplayers = conf.getString("textAsPlayerCount").replace("&","§")
+                VMotd.fakePlayers = conf.getInt("fakePlayersAmount")
+                VMotd.textAsPlayers = conf.getString("textAsPlayerCount").replace("&","§")
                 VMotd.motdlist.clear()
-                VMotd.serverdesc.clear()
+                VMotd.serverDesc.clear()
                 for(s in conf.getStringList("motd")){
                     VMotd.motdlist.add(s.replace("&","§"))
                 }
                 for(s in conf.getStringList("serverDescription")){
-                    VMotd.serverdesc.add(WrappedGameProfile(UUID.randomUUID(), s.replace("&","§")))
+                    VMotd.serverDesc.add(s.replace("&","§"))
                 }
-                VMotd.maxplayers = conf.getInt("maxPlayers")
+                VMotd.maxPlayers = conf.getInt("maxPlayers")
                 sender?.sendMessage("§aVMotd Reloaded")
-                println(VMotd.motdlist)
             }
             else if(args[0].uppercase() == "ADDMOTD"){
                 addMotd(sender!!, true, args)
@@ -67,7 +59,7 @@ object VMotdCommand : CommandExecutor {
                         m.removeAt(num)
                         conf.set("motd", m)
                         VMotd.motdlist.removeAt(num)
-                        conf.save(conffile)
+                        ConfigurationProvider.getProvider(YamlConfiguration::class.java).save(conf, conffile)
                         sender?.sendMessage("§aMotd removed")
                     }
                 }else {
@@ -86,7 +78,6 @@ object VMotdCommand : CommandExecutor {
         }else{
             wrongUsage(sender!!)
         }
-        return false
     }
 
     private fun wrongUsage(sender: CommandSender){
@@ -97,27 +88,31 @@ object VMotdCommand : CommandExecutor {
         sender.sendMessage("§8/vmotd tempmotd (text)")
     }
 
-    private fun addMotd(sender: CommandSender, save: Boolean, motd: Array<out String>?){
+    private fun addMotd(sender: CommandSender, save: Boolean, motd2: Array<out String>?){
+        val motd : ArrayList<String> = ArrayList()
+        for(i in 1 until motd2?.size!!){
+            motd.add(motd2[i])
+        }
         val conffile = File(VMotd.folder.parent, "config.yml")
-        val conf = YamlConfiguration.loadConfiguration(conffile)
-        if(motd!!.isNotEmpty()){
+        val conf = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(conffile)
+        if(motd.isNotEmpty()){
             val s : StringBuilder = StringBuilder()
             for(i in motd){
-                s.append(" $i")
+                s.append("$i ")
             }
             VMotd.motdlist.add(s.toString())
             if(save) {
                 val m : ArrayList<String> = conf.getStringList("motd") as ArrayList<String>
                 m.add(motd.toString())
                 conf.set("motd", m)
-                conf.save(conffile)
+                ConfigurationProvider.getProvider(YamlConfiguration::class.java).save(conf, conffile)
             }
             sender.sendMessage("§aAdded new Motd")
         }else{
             sender.sendMessage("§aUsage: /vmotd addmotd/tempmotd (text)")
         }
     }
-    
+
     @Throws(IOException::class)
     fun isPng(file: File): Boolean {
         FileInputStream(file).use { `is` -> return `is`.read() == 137 }
