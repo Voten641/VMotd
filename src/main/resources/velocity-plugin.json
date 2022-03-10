@@ -1,0 +1,1 @@
+{"id": "vmotd", "name" : "VMotd", "version" : "${project.version}", "authors": ["Voten641"] , "main": "me.voten.vmotd.velocity.VMotd"}

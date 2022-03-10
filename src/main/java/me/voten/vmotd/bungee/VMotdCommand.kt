@@ -1,14 +1,16 @@
 package me.voten.vmotd.bungee
 
+import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.CommandSender
 import net.md_5.bungee.api.Favicon
+import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.plugin.Command
 import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import java.util.*
+import java.util.regex.Pattern
 import javax.imageio.ImageIO
 import kotlin.collections.ArrayList
 
@@ -113,8 +115,26 @@ object VMotdCommand : Command("vmotd") {
         }
     }
 
+    private fun setString(s : String) : String{
+        return s.replace("%playeronline%", getPlayers().toString())
+            .replace("%newline%", "\n")
+            .replace("%playermax%", VMotd.maxPlayers.toString())
+            .replace("&","§")
+    }
+
     @Throws(IOException::class)
     fun isPng(file: File): Boolean {
         FileInputStream(file).use { `is` -> return `is`.read() == 137 }
+    }
+
+    private fun getPlayers() : Int{
+        if(VMotd.conf.getBoolean("fakePlayers")){
+            val playersOnline = when(VMotd.conf.getBoolean("showRealPlayers")){
+                true -> ProxyServer.getInstance().onlineCount + VMotd.fakePlayers
+                false -> VMotd.fakePlayers
+            }
+            return playersOnline
+        }
+        return ProxyServer.getInstance().onlineCount
     }
 }

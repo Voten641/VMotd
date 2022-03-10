@@ -1,0 +1,16 @@
+maxPlayers = 1_337
+motd = [
+  "&aMade by Voten641 %newline% &d%playeronline%",
+  "&fPlease review %newline% &emy plugin"
+]
+serverDescription = [
+  "&c<----------------------->",
+  "&eWebsite: Voten641.github.io",
+  "&eMax Player: %playermax%",
+  "&c<----------------------->"
+]
+enableTextAsPlayerCount = true
+textAsPlayerCount = "&eOnline Players: %playeronline%"
+fakePlayers = true
+fakePlayersAmount = 111
+showRealPlayers = true
