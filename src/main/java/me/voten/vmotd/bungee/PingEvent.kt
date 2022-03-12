@@ -22,15 +22,13 @@ object PingEvent : Listener {
         for(i in 0 until VMotd.serverDesc.size){
             sample[i] = PlayerInfo(setString(VMotd.serverDesc[i]), UUID.randomUUID())
         }
-        if(VMotd.conf.getBoolean("enableTextAsPlayerCount")) {
-            sinfo?.version = ServerPing.Protocol(setString(VMotd.textAsPlayers), sinfo?.version?.protocol!!-5)
+        if(VMotd.textAsPlayerbol) {
+            sinfo?.version = ServerPing.Protocol(setString(VMotd.textAsPlayers[Random.nextInt(0, VMotd.textAsPlayers.size)]), sinfo?.version?.protocol!!-5)
         }
         if(VMotd.icons.size > 0) sinfo?.setFavicon(VMotd.icons[Random.nextInt(0, VMotd.icons.size)])
         sinfo?.players?.max = VMotd.maxPlayers
         sinfo?.players?.sample = sample
-        if(VMotd.conf.getBoolean("fakePlayers")){
-            sinfo?.players?.online = getPlayers()
-        }
+        sinfo?.players?.online = getPlayers()
         sinfo?.descriptionComponent = TextComponent(setString(VMotd.motdlist[Random.nextInt(0, VMotd.motdlist.size)]))
         e.response = sinfo
     }
@@ -43,8 +41,8 @@ object PingEvent : Listener {
     }
 
     private fun getPlayers() : Int{
-        if(VMotd.conf.getBoolean("fakePlayers")){
-            val playersOnline = when(VMotd.conf.getBoolean("showRealPlayers")){
+        if(VMotd.fakePlayersbol){
+            val playersOnline = when(VMotd.showRealPlayers){
                 true -> ProxyServer.getInstance().onlineCount + VMotd.fakePlayers
                 false -> VMotd.fakePlayers
             }

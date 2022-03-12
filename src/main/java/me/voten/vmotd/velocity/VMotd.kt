@@ -9,6 +9,7 @@ import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.util.Favicon
+import java.awt.image.BufferedImage
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -55,7 +56,10 @@ class VMotd {
         if(folder.listFiles() != null) {
             for (icon in folder.listFiles()) {
                 if (isPng(icon)) {
-                    icons.add(Favicon.create(ImageIO.read(icon)))
+                    val img : BufferedImage = ImageIO.read(icon)
+                    if(img.width == 64 && img.height ==64){
+                        icons.add(Favicon.create(img))
+                    }else println("Icon " + icon.name + " cant be loaded, icon must be 64x64 pixels")
                 }
             }
         }

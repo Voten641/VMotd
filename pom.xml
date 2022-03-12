@@ -6,7 +6,7 @@
 
     <groupId>me.voten</groupId>
     <artifactId>VMotd</artifactId>
-    <version>1.3</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
 
     <name>VMotd</name>
